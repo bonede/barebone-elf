@@ -23,46 +23,27 @@ BITS 64
 %define SHT_PROGBITS 0x1
 %define SHT_NULL 0
 
-e_ident_MAGIC:
-db 0x7F, "ELF"
-e_ident_EI_CLASS:
-db ELF_64
-e_ident_EI_DATA:
-db LITTLE_ENDIAN
-e_ident_EI_VERSION:
-db 1
-e_ident_EI_OSABI:
-db SYSTEM_V_ABI
-e_ident_EI_ABIVERSION:
-db 0
-e_id_EI_PAD:
-times EI_NIDENT - ($-$$) db 0
-e_type:
-dw ET_EXEC
-e_machine:
-dw AMD_X64
-e_version:
-dd 1
-e_entry:
-dq CODE_VADDR_2
-e_phoff:
-dq programe_headers
-e_shoff:
-dq section_headers
-e_flags:
-dd 0
-e_ehsize:
-dw ELF_HEADER_SIZE
-e_phentsize:
-dw PROGRAM_HEADER_ENTRY_SIZE
-e_phnum:
-dw PROGRAM_HEADER_ENTRIES
-e_shentsize:
-dw SECTION_HEADER_ENTRY_SIZE
-e_shnum:
-dw SECTION_HEADER_ENTRIES
-e_shstrndx:
-dw STR_TABLE_INDEX
+
+db 0x7F, "ELF"                ; e_ident_MAGIC        
+db ELF_64                     ; e_ident_EI_CLASS
+db LITTLE_ENDIAN              ; e_ident_EI_DATA
+db 1                          ; e_ident_EI_VERSION
+db SYSTEM_V_ABI               ; e_ident_EI_OSABI
+db 0                          ; e_ident_EI_ABIVERSION
+times EI_NIDENT - ($-$$) db 0 ; padding
+dw ET_EXEC                    ; e_type
+dw AMD_X64                    ; e_machine
+dd 1                          ; e_version
+dq CODE_VADDR_2               ; e_entry
+dq programe_headers           ; e_phoff
+dq section_headers            ; e_shoff
+dd 0                          ; e_flags
+dw ELF_HEADER_SIZE            ; e_ehsize
+dw PROGRAM_HEADER_ENTRY_SIZE  ; e_phentsize
+dw PROGRAM_HEADER_ENTRIES     ; e_phnum
+dw SECTION_HEADER_ENTRY_SIZE  ; e_shentsize
+dw SECTION_HEADER_ENTRIES     ; e_shnum
+dw STR_TABLE_INDEX            ; e_shstrndx
 programe_headers:
     p_type:
     dd PT_LOAD
