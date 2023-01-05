@@ -11,9 +11,6 @@ BITS 64
 %define SECTION_HEADER_ENTRY_SIZE 0x40
 %define SECTION_HEADER_ENTRIES 0x4
 %define PT_LOAD 1
-%define CODE_VADDR_2 0x08048000
-%define CODE_VADDR 0x401020
-%define RODATA_VADDR 0x402000
 %define PF_R 0x4
 %define PF_X 0x1
 %define SHF_ALLOC 0x2
@@ -46,28 +43,27 @@ dw SECTION_HEADER_ENTRY_SIZE  ; e_shentsize
 dw SECTION_HEADER_ENTRIES     ; e_shnum
 dw STR_TABLE_INDEX            ; e_shstrndx
 programe_headers:
-    p_type:
-    dd PT_LOAD
-    p_flags:
-    dd PF_R | PF_X
-    p_offset:
-    dq code
-    p_vaddr:
-    dq BASE_ADDR + code
-    p_paddr:
-    dq 0
-    p_filesz:
-    dq rodata - code
-    p_memsz:
-    dq rodata - code
-    p_align:
-    dq 0x1000
+    ; code
+    dd PT_LOAD                ; p_type
+    dd PF_R | PF_X            ; p_flags
+    dq code                   ; p_offset
+    dq BASE_ADDR + code       ; p_vaddr
+    dq 0                      ; p_paddr
+    dq section_names - code   ; p_filesz
+    dq section_names - code   ; p_memsz
+    dq 0x1000                 ; p_align
 code:
-    mov     eax, 60
-    mov     edi, 42
+    mov     eax, 1            ; syscall write(stdout, char*, count)
+    mov     edi, 1
+    mov     esi, BASE_ADDR + rodata
+    mov     edx, rodata_size
     syscall
+    mov eax, 60               ; syscall exit(code)
+    mov edi, 0               
+    syscall                   
 rodata:
-    db "Hello world!", 0
+    db `Hello world!\n`
+rodata_size equ $ - rodata
 section_names:
     db 0,
 str_shstrtab:
@@ -101,7 +97,7 @@ section_headers:
     dq section_names - rodata     ;sh_size
     dd 0                          ;sh_link
     dd 0                          ;sh_info
-    dq 0x8                        ;sh_addralign
+    dq 0x4                        ;sh_addralign
     dq section_names - rodata     ;sh_entsize
     ; .shstrtab
     dd str_shstrtab - section_names
