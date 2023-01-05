@@ -14,7 +14,7 @@ BITS 64
 ;%define SECTION_HEADER_ENTRIES 0x4
 %define SECTION_HEADER_ENTRIES 0
 %define PT_LOAD 1
-%define CODE_VADDR 0x8048000
+%define CODE_VADDR 0x400000
 %define PF_R 0x4
 %define PF_X 0x1
 %define SHF_ALLOC 0x2
@@ -24,7 +24,10 @@ BITS 64
 %define SHT_STRTAB 0x3
 %define SHT_PROGBITS 0x1
 %define SHT_NULL 0
+%define OFFSET 0x78
 
+
+org 0x400000
 
 db 0x7F, "ELF"                ; e_ident_MAGIC        
 db ELF_64                     ; e_ident_EI_CLASS
@@ -36,9 +39,9 @@ times EI_NIDENT - ($-$$) db 0 ; padding
 dw ET_EXEC                    ; e_type
 dw AMD_X64                    ; e_machine
 dd 1                          ; e_version
-dq CODE_VADDR + code                 ; e_entry
-dq programe_headers           ; e_phoff
-;dq section_headers            ; e_shoff
+dq code ; e_entry
+dq programe_headers - $$      ; e_phoff
+;dq section_headers           ; e_shoff
 dq 0                          ; e_shoff
 dd 0                          ; e_flags
 dw ELF_HEADER_SIZE            ; e_ehsize
@@ -50,15 +53,15 @@ dw STR_TABLE_INDEX            ; e_shstrndx
 programe_headers:
     dd PT_LOAD                ; p_type
     dd PF_R | PF_X            ; p_flags
-    dq 0                      ; p_offset
-    dq CODE_VADDR             ; p_vaddr
-    dq CODE_VADDR             ; p_paddr
-    dq filesize               ; p_filesz
-    dq filesize               ; p_memsz
+    dq code - $$              ; p_offset
+    dq code                   ; p_vaddr
+    dq code                   ; p_paddr
+    dq codesize               ; p_filesz
+    dq codesize               ; p_memsz
     dq 0x1000                 ; p_align
 code:
-    mov edi,42       
+    mov edi,42
     mov eax,60
     syscall
-code_end:
-filesize    equ     $ - $$
+codesize equ $ - code
+filesize  equ $ - $$
