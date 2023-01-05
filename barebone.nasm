@@ -9,16 +9,18 @@ BITS 64
 %define PROGRAM_HEADER_ENTRY_SIZE 0x38
 %define PROGRAM_HEADER_ENTRIES 0x1
 %define SECTION_HEADER_ENTRY_SIZE 0x40
-%define SECTION_HEADER_ENTRIES 0x4
+;%define SECTION_HEADER_ENTRIES 0x4
+%define SECTION_HEADER_ENTRIES 0
 %define PT_LOAD 1
-%define CODE_VADDR_2 0x08048054
+%define CODE_VADDR_2 0x08048000
 %define CODE_VADDR 0x401020
 %define RODATA_VADDR 0x402000
 %define PF_R 0x4
 %define PF_X 0x1
 %define SHF_ALLOC 0x2
 %define SHF_EXECINSTR 0x4
-%define STR_TABLE_INDEX 0x3
+;%define STR_TABLE_INDEX 0x3
+%define STR_TABLE_INDEX 0
 %define SHT_STRTAB 0x3
 %define SHT_PROGBITS 0x1
 %define SHT_NULL 0
@@ -36,7 +38,8 @@ dw AMD_X64                    ; e_machine
 dd 1                          ; e_version
 dq CODE_VADDR_2               ; e_entry
 dq programe_headers           ; e_phoff
-dq section_headers            ; e_shoff
+;dq section_headers            ; e_shoff
+dq 0                          ; e_shoff
 dd 0                          ; e_flags
 dw ELF_HEADER_SIZE            ; e_ehsize
 dw PROGRAM_HEADER_ENTRY_SIZE  ; e_phentsize
@@ -54,7 +57,7 @@ programe_headers:
     p_vaddr:
     dq CODE_VADDR_2
     p_paddr:
-    dq 0
+    dq CODE_VADDR_2
     p_filesz:
     dq rodata - code
     p_memsz:
