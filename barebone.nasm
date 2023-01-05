@@ -9,8 +9,7 @@ BITS 64
 %define PROGRAM_HEADER_ENTRY_SIZE 0x38
 %define PROGRAM_HEADER_ENTRIES 0x1
 %define SECTION_HEADER_ENTRY_SIZE 0x40
-;%define SECTION_HEADER_ENTRIES 0x4
-%define SECTION_HEADER_ENTRIES 0
+%define SECTION_HEADER_ENTRIES 0x4
 %define PT_LOAD 1
 %define CODE_VADDR_2 0x08048000
 %define CODE_VADDR 0x401020
@@ -19,12 +18,12 @@ BITS 64
 %define PF_X 0x1
 %define SHF_ALLOC 0x2
 %define SHF_EXECINSTR 0x4
-;%define STR_TABLE_INDEX 0x3
-%define STR_TABLE_INDEX 0
+%define STR_TABLE_INDEX 0x3
 %define SHT_STRTAB 0x3
 %define SHT_PROGBITS 0x1
 %define SHT_NULL 0
 
+%define BASE_ADDR 0x400000
 
 db 0x7F, "ELF"                ; e_ident_MAGIC        
 db ELF_64                     ; e_ident_EI_CLASS
@@ -36,10 +35,9 @@ times EI_NIDENT - ($-$$) db 0 ; padding
 dw ET_EXEC                    ; e_type
 dw AMD_X64                    ; e_machine
 dd 1                          ; e_version
-dq CODE_VADDR_2               ; e_entry
+dq BASE_ADDR + code           ; e_entry
 dq programe_headers           ; e_phoff
-;dq section_headers            ; e_shoff
-dq 0                          ; e_shoff
+dq section_headers            ; e_shoff
 dd 0                          ; e_flags
 dw ELF_HEADER_SIZE            ; e_ehsize
 dw PROGRAM_HEADER_ENTRY_SIZE  ; e_phentsize
@@ -55,9 +53,9 @@ programe_headers:
     p_offset:
     dq code
     p_vaddr:
-    dq CODE_VADDR_2
+    dq BASE_ADDR + code
     p_paddr:
-    dq CODE_VADDR_2
+    dq 0
     p_filesz:
     dq rodata - code
     p_memsz:
@@ -65,8 +63,8 @@ programe_headers:
     p_align:
     dq 0x1000
 code:
-    mov     eax, 0x3c
-    xor     edi, edi
+    mov     eax, 60
+    mov     edi, 42
     syscall
 rodata:
     db "Hello world!", 0
@@ -87,7 +85,7 @@ section_headers:
     dd str_text - section_names   ;sh_name
     dd SHT_PROGBITS               ;sh_type
     dq SHF_ALLOC | SHF_EXECINSTR  ;sh_flags
-    dq CODE_VADDR                 ;sh_addr
+    dq BASE_ADDR + code           ;sh_addr
     dq code                       ;sh_offset
     dq rodata - code              ;sh_size
     dd 0                          ;sh_link
@@ -98,7 +96,7 @@ section_headers:
     dd str_rodata - section_names ;sh_name
     dd SHT_PROGBITS               ;sh_type
     dq SHF_ALLOC                  ;sh_flags
-    dq RODATA_VADDR               ;sh_addr
+    dq BASE_ADDR + rodata         ;sh_addr
     dq rodata                     ;sh_offset
     dq section_names - rodata     ;sh_size
     dd 0                          ;sh_link

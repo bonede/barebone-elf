@@ -10,11 +10,14 @@ barebone: barebone.nasm
 	nasm -o barebone64 -f bin barebone64.nasm
 	chmod u+x barebone64
 
+min64: min64.nasm
+	nasm -o min64 -f bin min64.nasm
+	chmod u+x min64
+
+raw: raw.dump makeraw.sh
+	./makeraw.sh
+
 clean:
-	rm barebone
-
-dump: barebone
-	hexdump -C barebone
-
-header: barebone
-	readelf -h barebone
+	rm barebone barebone32 barebone64 raw min64 sample 64
+sample: sample.c
+	gcc -no-pie -o sample sample.c
