@@ -47,5 +47,5 @@
 # >>>>>>>>>>>>> PROGRAM SEGMENT <<<<<<<<<<<<< 
 
 B8 01 00 00 00  # 59 eax <- 1 (exit)
-BB 00 00 00 00  # 5E ebx <- 0 (param)
+BB 2A 00 00 00  # 5E ebx <- 42 (param)
 CD 80           # 60 syscall >> int 80
